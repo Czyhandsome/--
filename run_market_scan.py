@@ -11,6 +11,7 @@ from datetime import date
 MA_WINDOW = 20          # 周线 MA20 ≈ 5 个月
 MIN_LIST_DAYS = 250     # 至少上市一年
 MAX_OUTPUT = 50         # 最多输出 50 只
+MIN_SHANGZHANG = 1000   # 上涨家数阈值
 
 OUTPUT_DIR = Path("market")
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -41,8 +42,8 @@ else:
 
 print(f"📈 上涨家数：{up_cnt}")
 
-if up_cnt < 3000:
-    print(f"🚫 市场环境不佳（上涨 {up_cnt} 家），停止扫描")
+if up_cnt < MIN_SHANGZHANG:
+    print(f"🚫 市场环境不佳（上涨 {up_cnt} 家小于阈值 {MIN_SHANGZHANG}），停止扫描")
     exit(0)
 
 print("✅ 市场环境允许，继续扫描")
@@ -51,14 +52,33 @@ print("✅ 市场环境允许，继续扫描")
 # 个股扫描
 # =========================
 
-for _, row in stock_list.iterrows():
+print("📥 Fetching daily snapshot...")
+spot = ak.stock_zh_a_spot_em()
+
+# 只保留最近有交易、非 ST、非停牌
+valid_codes = set(
+    spot[
+        (spot["成交量"] > 0) &
+        (~spot["名称"].str.contains("ST"))
+    ]["代码"]
+)
+
+total = len(stock_list)
+
+for i, (_, row) in enumerate(stock_list.iterrows(), 1):
+    if i % 50 == 0:
+        print(f"⏳ Progress: {i}/{total}")
     code = row["code"]
+
+    if code not in valid_codes:
+        continue
     name = row["name"]
 
     try:
         df = ak.stock_zh_a_hist(
             symbol=code,
             period="daily",
+            start_date="20220101",
             adjust=""
         )
     except Exception:
