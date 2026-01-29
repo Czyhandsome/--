@@ -1,0 +1,14 @@
+{
+  "trade_date": "2026-01-29",
+  "symbol": "159919",
+  "signal": "HOLD",
+  "price_reference": 4.917,
+  "price_range": [
+    4.892,
+    4.942
+  ],
+  "stop_loss": 4.819,
+  "quantity": 0,
+  "ma_window": 20,
+  "reason": "Close/MA cross"
+}

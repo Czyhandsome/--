@@ -1,0 +1,14 @@
+{
+  "trade_date": "2026-01-29",
+  "symbol": "510300",
+  "signal": "HOLD",
+  "price_reference": 4.718,
+  "price_range": [
+    4.694,
+    4.742
+  ],
+  "stop_loss": 4.624,
+  "quantity": 0,
+  "ma_window": 20,
+  "reason": "Close/MA cross"
+}
